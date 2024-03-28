@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/secondary"
+    tools:context=".MainActivity">
+
+    <ImageButton
+        android:id="@+id/btnAccount"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/transparent"
+        android:contentDescription="@string/account"
+        android:padding="10dp"
+        android:scaleType="centerInside"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_account" />
+
+    <ImageButton
+        android:id="@+id/btnNewDish"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="80dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/transparent"
+        android:contentDescription="@string/new_dish"
+        android:padding="10dp"
+        android:scaleType="centerInside"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.407"
+        app:layout_constraintStart_toEndOf="@+id/textView2"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_add" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="88dp"
+        android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif-black"
+        android:text="@string/menus"
+        android:textSize="34sp"
+        app:layout_constraintStart_toEndOf="@+id/btnAccount"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="36dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp">
+
+            <Button
+                android:id="@+id/btnBreakfasts"
+                android:layout_width="match_parent"
+                android:layout_height="110dp"
+                android:paddingStart="-50dp"
+                android:background="@drawable/radius"
+                android:text="@string/breakfasts"
+                android:textColor="@color/secondary"
+                android:textSize="28dp"
+                android:fontFamily="sans-serif-black"
+                app:backgroundTint="@null"/>
+
+            <ImageView
+                android:id="@+id/imgBreakfast"
+                android:layout_width="88dp"
+                android:layout_height="88dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="20dp"
+                android:elevation="1dp"
+                app:srcCompat="@drawable/breakfast" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="36dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp">
+
+            <Button
+                android:id="@+id/btnLunches"
+                android:layout_width="match_parent"
+                android:layout_height="110dp"
+                android:paddingStart="-50dp"
+                android:background="@drawable/radius"
+                android:text="@string/lunches"
+                android:textColor="@color/secondary"
+                android:textSize="28dp"
+                android:fontFamily="sans-serif-black"
+                app:backgroundTint="@null"/>
+
+            <ImageView
+                android:id="@+id/imgLunch"
+                android:layout_width="88dp"
+                android:layout_height="88dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="20dp"
+                android:elevation="1dp"
+                app:srcCompat="@drawable/lunch" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="36dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp">
+
+            <Button
+                android:id="@+id/btnDinners"
+                android:layout_width="match_parent"
+                android:layout_height="110dp"
+                android:paddingStart="-50dp"
+                android:background="@drawable/radius"
+                android:text="@string/dinners"
+                android:textColor="@color/secondary"
+                android:textSize="28dp"
+                android:fontFamily="sans-serif-black"
+                app:backgroundTint="@null"/>
+
+            <ImageView
+                android:id="@+id/imgDinner"
+                android:layout_width="88dp"
+                android:layout_height="88dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="20dp"
+                android:elevation="1dp"
+                app:srcCompat="@drawable/dinner" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
