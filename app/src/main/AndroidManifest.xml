@@ -13,6 +13,12 @@
         android:theme="@style/Theme.CP192194_AV180327_CM180362_PA210749"
         tools:targetApi="31">
         <activity
+            android:name=".MenuViewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".FoodFormActivity"
+            android:exported="false" />
+        <activity
             android:name=".ChangePasswordActivity"
             android:exported="false" />
         <activity

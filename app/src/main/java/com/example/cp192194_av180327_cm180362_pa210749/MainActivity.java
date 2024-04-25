@@ -17,7 +17,7 @@ import com.google.firebase.auth.FirebaseAuth;
 public class MainActivity extends AppCompatActivity {
 
     ImageButton btnAccount, btnNewDish;
-    Button btnChangePassword, btnLogout;
+    Button btnChangePassword, btnLogout, btnBreakfasts,btnLunches,btnDinners;
 
     Dialog accountDialog;
 
@@ -28,13 +28,18 @@ public class MainActivity extends AppCompatActivity {
 
         btnNewDish = findViewById(R.id.btnNewDish);
         btnAccount = findViewById(R.id.btnAccount);
+        btnBreakfasts = findViewById(R.id.btnBreakfasts);
+        btnLunches = findViewById(R.id.btnLunches);
+        btnDinners = findViewById(R.id.btnDinners);
 
         //hiding stuff if no one is logged
-        if(FirebaseAuth.getInstance().getCurrentUser() != null){
+        //DESCOMENTAR SI SE NECESITA OCULTAR EL BOTON DE  AGFREGAR PLATILLO
+
+        /* if(FirebaseAuth.getInstance().getCurrentUser() != null){
             btnNewDish.setVisibility(View.VISIBLE);
         }else{
             btnNewDish.setVisibility(View.GONE);
-        }
+        } */
 
         //dialog settings and funtionality
         accountDialog = new Dialog(MainActivity.this);
@@ -70,6 +75,24 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
 
+        });
+
+        btnBreakfasts.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), MenuViewActivity.class);
+            startActivity(intent);
+        });
+        btnLunches.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), MenuViewActivity.class);
+            startActivity(intent);
+        });
+        btnDinners.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), MenuViewActivity.class);
+            startActivity(intent);
+        });
+
+        btnNewDish.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), FoodFormActivity.class);
+            startActivity(intent);
         });
 
     }

@@ -21,4 +21,6 @@
     <string name="change_password">Cambiar contraseña</string>
     <string name="logout">Cerrar sesión</string>
     <string name="do_change_password">Realizar cambio</string>
+    <string name="daymenu">Menu del dia</string>
+    <string name="foodform">Agregar Platillo</string>
 </resources>
