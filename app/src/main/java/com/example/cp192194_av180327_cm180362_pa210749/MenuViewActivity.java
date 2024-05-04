@@ -34,10 +34,10 @@ public class MenuViewActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerViewPlatillos);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         List<Platillo> platillos = new ArrayList<>();
-        adapter = new PlatilloAdapter(this, platillos);
+        String category = getIntent().getStringExtra("category");
+        adapter = new PlatilloAdapter(this, platillos, category);
         recyclerView.setAdapter(adapter);
 
-        String category = getIntent().getStringExtra("category");
         DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("platillos").child(category);
         databaseRef.addValueEventListener(new ValueEventListener() {
             @Override

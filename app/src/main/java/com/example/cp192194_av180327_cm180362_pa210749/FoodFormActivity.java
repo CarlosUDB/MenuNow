@@ -1,11 +1,14 @@
 package com.example.cp192194_av180327_cm180362_pa210749;
 
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -13,10 +16,14 @@ import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 import java.util.UUID;
 
@@ -27,6 +34,10 @@ public class FoodFormActivity extends AppCompatActivity {
     private ImageView imageViewPlatillo;
     private Uri imageUri;
     private EditText editTextNombre, editTextPrecio, editTextDescripcion;
+    private String Estado;
+
+    private String NameEditt;
+    private String CategoriaEdit;
     private RadioGroup radioGroupTipo;
 
     // Variables para Firebase, permitiendo el acceso a la base de datos y al almacenamiento.
@@ -52,6 +63,43 @@ public class FoodFormActivity extends AppCompatActivity {
         editTextDescripcion = findViewById(R.id.comentario);
         radioGroupTipo = findViewById(R.id.radioGroup);
 
+        String IdEdit = getIntent().getStringExtra("IdEdit");
+        String NameEdit = getIntent().getStringExtra("NameEdit");
+        String DescriptionEdit = getIntent().getStringExtra("DescriptionEdit");
+        String PriceEdit = getIntent().getStringExtra("PriceEdit");
+        String ImageEdit = getIntent().getStringExtra("ImageEdit");
+        String CategoryEdit = getIntent().getStringExtra("CategoryEdit");
+
+        if(NameEdit != null & DescriptionEdit != null & PriceEdit != null & ImageEdit != null) {
+            editTextNombre.setText(NameEdit);
+            editTextDescripcion.setText(DescriptionEdit);
+            editTextPrecio.setText(PriceEdit);
+            Picasso.get().load(Uri.parse(ImageEdit)).into(imageViewPlatillo);
+            imageUri = Uri.parse(ImageEdit);
+            CategoriaEdit = CategoryEdit;
+            Estado = "Edicion";
+            NameEditt = NameEdit;
+
+            if (CategoryEdit != null) {
+                switch (CategoryEdit) {
+                    case "Desayuno":
+                        radioGroupTipo.check(R.id.radioButtonDesayuno);
+                        break;
+                    case "Almuerzo":
+                        radioGroupTipo.check(R.id.radioButtonAlmuerzo);
+                        break;
+                    case "Cena":
+                        radioGroupTipo.check(R.id.radioButtonCena);
+                        break;
+                    // Agrega más casos según sea necesario para otras categorías
+                    default:
+                        // Valor predeterminado en caso de que CategoryEdit no coincida con ninguna categoría conocida
+                        break;
+                }
+            }
+
+        }
+
 
         // Configuración de Firebase.
         database = FirebaseDatabase.getInstance();
@@ -62,7 +110,15 @@ public class FoodFormActivity extends AppCompatActivity {
         // Establecimiento de los listeners para los botones.
         btnAddImage.setOnClickListener(v -> openGallery());
         btnSave.setOnClickListener(v -> uploadImage());
-        btnCancel.setOnClickListener(v -> finish());
+        btnCancel.setOnClickListener(v -> {
+            if (editTextNombre == null || editTextDescripcion == null || editTextPrecio == null || imageViewPlatillo == null || radioGroupTipo == null) {
+                savePlatillo(ImageEdit);
+                finish();
+            } else {
+                finish();
+            }
+        }
+        );
 
         btnReturn.setOnClickListener(v -> {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -89,7 +145,8 @@ public class FoodFormActivity extends AppCompatActivity {
 
     // Método para subir la imagen a Firebase Storage y validar los inputs antes de guardar.
     private void uploadImage() {
-        if (imageUri != null && validateInputs()) {
+        String ImageEdit = getIntent().getStringExtra("ImageEdit");
+        if (ImageEdit == null & imageUri != null && validateInputs()) {
             StorageReference fileRef = storageRef.child("FoodImages/" + UUID.randomUUID().toString());
             fileRef.putFile(imageUri)
                     .addOnSuccessListener(taskSnapshot -> fileRef.getDownloadUrl().addOnSuccessListener(uri -> {
@@ -99,8 +156,10 @@ public class FoodFormActivity extends AppCompatActivity {
                     .addOnFailureListener(e -> {
                         Toast.makeText(FoodFormActivity.this, "Fallo al cargar la imagen", Toast.LENGTH_SHORT).show();
                     });
+        } else if (ImageEdit != null) {
+            savePlatillo(ImageEdit);
         } else {
-            if (imageUri == null) {
+            if (imageUri == null & ImageEdit == null) {
                 Toast.makeText(this, "Por favor, seleccione una imagen", Toast.LENGTH_SHORT).show();
             }
         }
@@ -112,6 +171,7 @@ public class FoodFormActivity extends AppCompatActivity {
         String price = editTextPrecio.getText().toString().trim();
         String description = editTextDescripcion.getText().toString().trim();
         int selectedId = radioGroupTipo.getCheckedRadioButtonId();
+
 
         if (name.isEmpty()) {
             editTextNombre.setError("El nombre no puede estar vacío");
@@ -134,6 +194,8 @@ public class FoodFormActivity extends AppCompatActivity {
 
     // Método para guardar la información del platillo en Firebase Database bajo la categoría elegida.
     private void savePlatillo(String imageUrl) {
+        Estado = "Guardar";
+        String id = UUID.randomUUID().toString();
         String name = editTextNombre.getText().toString();
         String price = editTextPrecio.getText().toString();
         String description = editTextDescripcion.getText().toString();
@@ -153,11 +215,18 @@ public class FoodFormActivity extends AppCompatActivity {
 
         if (!categoriaPath[0].isEmpty()) {
             DatabaseReference categoryRef = dbRef.child(categoriaPath[0]);
-            Platillo platillo = new Platillo(name, description, price, imageUrl);
+            Platillo platillo = new Platillo(id, name, description, price, imageUrl);
             categoryRef.push().setValue(platillo)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            Toast.makeText(FoodFormActivity.this, "Platillo guardado en " + categoriaPath[0], Toast.LENGTH_SHORT).show();
+                            if (Estado != "Edicion") {
+                                Toast.makeText(FoodFormActivity.this, "Platillo guardado en " + categoriaPath[0], Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+                            /*finish();
+                            overridePendingTransition(0, 0);
+                            startActivity(getIntent());
+                            overridePendingTransition(0, 0);*/
                         } else {
                             Toast.makeText(FoodFormActivity.this, "Error al guardar", Toast.LENGTH_SHORT).show();
                         }
