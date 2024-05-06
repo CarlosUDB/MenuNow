@@ -48,29 +48,56 @@ public class MenuViewActivity extends AppCompatActivity {
 
         DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("platillos").child(category);
         String today = getCurrentDate();
-        databaseRef.orderByChild("date").equalTo(today).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                platillos.clear();
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        Platillo platillo = snapshot.getValue(Platillo.class);
-                        platillos.add(platillo);
+        if(FirebaseAuth.getInstance().getCurrentUser() != null){
+            databaseRef.orderByChild("date").equalTo(today).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    platillos.clear();
+                    if (dataSnapshot.exists()) {
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            Platillo platillo = snapshot.getValue(Platillo.class);
+                            platillos.add(platillo);
+                        }
+                    }else {
+                        // No se encontraron platillos para la fecha actual
+                        Toast.makeText(MenuViewActivity.this, "No hay platillos para el día de hoy.", Toast.LENGTH_LONG).show();
+                        adapter.notifyDataSetChanged(); // Aunque la lista esté vacía, es bueno notificar al adaptador
                     }
-                }else {
-                    // No se encontraron platillos para la fecha actual
-                    Toast.makeText(MenuViewActivity.this, "No hay platillos para el día de hoy.", Toast.LENGTH_LONG).show();
-                    adapter.notifyDataSetChanged(); // Aunque la lista esté vacía, es bueno notificar al adaptador
+                    adapter.notifyDataSetChanged();
                 }
-                adapter.notifyDataSetChanged();
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(MenuViewActivity.this, "Failed to load data.", Toast.LENGTH_LONG).show();
-            }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Toast.makeText(MenuViewActivity.this, "Failed to load data.", Toast.LENGTH_LONG).show();
+                }
 
-        });
+            });
+        }else{
+            databaseRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    platillos.clear();
+                    if (dataSnapshot.exists()) {
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            Platillo platillo = snapshot.getValue(Platillo.class);
+                            platillos.add(platillo);
+                        }
+                    }else {
+                        // No se encontraron platillos para la fecha actual
+                        Toast.makeText(MenuViewActivity.this, "No hay platillos para el día de hoy.", Toast.LENGTH_LONG).show();
+                        adapter.notifyDataSetChanged(); // Aunque la lista esté vacía, es bueno notificar al adaptador
+                    }
+                    adapter.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Toast.makeText(MenuViewActivity.this, "Failed to load data.", Toast.LENGTH_LONG).show();
+                }
+
+            });
+        }
+
 
         // Verificar el estado de autenticación para mostrar/ocultar botones
 
