@@ -49,7 +49,7 @@ public class MenuViewActivity extends AppCompatActivity {
         DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("platillos").child(category);
         String today = getCurrentDate();
         if(FirebaseAuth.getInstance().getCurrentUser() != null){
-            databaseRef.orderByChild("date").equalTo(today).addValueEventListener(new ValueEventListener() {
+            databaseRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     platillos.clear();
@@ -73,7 +73,7 @@ public class MenuViewActivity extends AppCompatActivity {
 
             });
         }else{
-            databaseRef.addValueEventListener(new ValueEventListener() {
+            databaseRef.orderByChild("date").equalTo(today).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     platillos.clear();
