@@ -5,10 +5,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.icu.text.SimpleDateFormat;
+import android.icu.util.Calendar;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -17,12 +21,17 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class MenuViewActivity extends AppCompatActivity {
     ImageButton btnNewDish;
     ImageButton btnReturn;
     private RecyclerView recyclerView;
     private PlatilloAdapter adapter;
+    private String getCurrentDate() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        return dateFormat.format(Calendar.getInstance().getTime());
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,7 +39,6 @@ public class MenuViewActivity extends AppCompatActivity {
 
         btnReturn = findViewById(R.id.btnReturn);
         btnNewDish = findViewById(R.id.btnNewDish);
-
         recyclerView = findViewById(R.id.recyclerViewPlatillos);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         List<Platillo> platillos = new ArrayList<>();
@@ -39,13 +47,20 @@ public class MenuViewActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("platillos").child(category);
-        databaseRef.addValueEventListener(new ValueEventListener() {
+        String today = getCurrentDate();
+        databaseRef.orderByChild("date").equalTo(today).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 platillos.clear();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Platillo platillo = snapshot.getValue(Platillo.class);
-                    platillos.add(platillo);
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        Platillo platillo = snapshot.getValue(Platillo.class);
+                        platillos.add(platillo);
+                    }
+                }else {
+                    // No se encontraron platillos para la fecha actual
+                    Toast.makeText(MenuViewActivity.this, "No hay platillos para el día de hoy.", Toast.LENGTH_LONG).show();
+                    adapter.notifyDataSetChanged(); // Aunque la lista esté vacía, es bueno notificar al adaptador
                 }
                 adapter.notifyDataSetChanged();
             }
@@ -58,13 +73,12 @@ public class MenuViewActivity extends AppCompatActivity {
         });
 
         // Verificar el estado de autenticación para mostrar/ocultar botones
-        //DESCOMENTAR SI SE NECESITA OCULTAR EL BOTON DE  AGFREGAR PLATILLO
 
-        /* if(FirebaseAuth.getInstance().getCurrentUser() != null){
+        if(FirebaseAuth.getInstance().getCurrentUser() != null){
             btnNewDish.setVisibility(View.VISIBLE);
         }else{
-            btnNewDish.setVisibility(View.GONE);
-        } */
+            btnNewDish.setVisibility(View.INVISIBLE);
+        }
 
         btnReturn.setOnClickListener(v -> {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);

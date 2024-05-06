@@ -36,11 +36,11 @@ public class MainActivity extends AppCompatActivity {
         //hiding stuff if no one is logged
         //DESCOMENTAR SI SE NECESITA OCULTAR EL BOTON DE  AGFREGAR PLATILLO
 
-        /* if(FirebaseAuth.getInstance().getCurrentUser() != null){
+         if(FirebaseAuth.getInstance().getCurrentUser() != null){
             btnNewDish.setVisibility(View.VISIBLE);
         }else{
             btnNewDish.setVisibility(View.GONE);
-        } */
+        }
 
         //dialog settings and funtionality
         accountDialog = new Dialog(MainActivity.this);

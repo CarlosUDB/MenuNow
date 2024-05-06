@@ -1,25 +1,20 @@
 package com.example.cp192194_av180327_cm180362_pa210749;
 
 public class Platillo {
-    private String id;
-    private String name;
-    private String description;
-    private String price;
-    private String imageUrl;
-
-    private String fecha;
+    private String id, name, description, price, imageUrl, date;
 
     // Constructor vacío necesario para usar Firebase
     public Platillo() {
     }
 
     // Constructor con todos los atributos
-    public Platillo(String id,String name, String description, String price, String imageUrl) {
+    public Platillo(String id,String name, String description, String price, String imageUrl, String date) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
         this.imageUrl = imageUrl;
+        this.date = date;
     }
 
     // Getters y Setters
@@ -58,5 +53,12 @@ public class Platillo {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 }

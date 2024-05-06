@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -14,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -24,7 +26,11 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
+import android.app.DatePickerDialog;
+import android.widget.DatePicker;
 
+import java.util.Calendar;
+import java.util.Locale;
 import java.util.UUID;
 
 public class FoodFormActivity extends AppCompatActivity {
@@ -45,7 +51,11 @@ public class FoodFormActivity extends AppCompatActivity {
     private DatabaseReference dbRef;
     private FirebaseStorage storage;
     private StorageReference storageRef;
+    private TextView textViewFecha;
+    private int mYear, mMonth, mDay;
+    private String selectedDate;
 
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,11 +67,14 @@ public class FoodFormActivity extends AppCompatActivity {
         Button btnAddImage = findViewById(R.id.btnAddImage);
         Button btnSave = findViewById(R.id.btnSave);
         Button btnCancel = findViewById(R.id.btnCancel);
+        Button btnSelectDate = findViewById(R.id.btnSelectDate);
         ImageButton btnReturn = findViewById(R.id.btnReturn);
         editTextNombre = findViewById(R.id.nombre);
         editTextPrecio = findViewById(R.id.precio);
         editTextDescripcion = findViewById(R.id.comentario);
         radioGroupTipo = findViewById(R.id.radioGroup);
+        textViewFecha = findViewById(R.id.textViewFecha);
+
 
         String IdEdit = getIntent().getStringExtra("IdEdit");
         String NameEdit = getIntent().getStringExtra("NameEdit");
@@ -69,14 +82,16 @@ public class FoodFormActivity extends AppCompatActivity {
         String PriceEdit = getIntent().getStringExtra("PriceEdit");
         String ImageEdit = getIntent().getStringExtra("ImageEdit");
         String CategoryEdit = getIntent().getStringExtra("CategoryEdit");
+        String DateEdit = getIntent().getStringExtra("DateEdit");
 
-        if(NameEdit != null & DescriptionEdit != null & PriceEdit != null & ImageEdit != null) {
+        if(NameEdit != null & DescriptionEdit != null & PriceEdit != null & ImageEdit != null & DateEdit != null) {
             editTextNombre.setText(NameEdit);
             editTextDescripcion.setText(DescriptionEdit);
             editTextPrecio.setText(PriceEdit);
             Picasso.get().load(Uri.parse(ImageEdit)).into(imageViewPlatillo);
             imageUri = Uri.parse(ImageEdit);
             CategoriaEdit = CategoryEdit;
+            textViewFecha.setText(DateEdit);
             Estado = "Edicion";
             NameEditt = NameEdit;
 
@@ -111,10 +126,12 @@ public class FoodFormActivity extends AppCompatActivity {
         btnAddImage.setOnClickListener(v -> openGallery());
         btnSave.setOnClickListener(v -> uploadImage());
         btnCancel.setOnClickListener(v -> {
-            if (editTextNombre == null || editTextDescripcion == null || editTextPrecio == null || imageViewPlatillo == null || radioGroupTipo == null) {
-                savePlatillo(ImageEdit);
+            if (editTextNombre == null || editTextDescripcion == null || editTextPrecio == null || imageViewPlatillo == null || radioGroupTipo == null || textViewFecha == null) {
+                Log.e("Revisión", "Estan vacios");
                 finish();
             } else {
+                savePlatillo(ImageEdit);
+                Log.e("Revisión", "vacios");
                 finish();
             }
         }
@@ -123,6 +140,25 @@ public class FoodFormActivity extends AppCompatActivity {
         btnReturn.setOnClickListener(v -> {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);
+        });
+
+        // Listener para el botón de fecha
+        btnSelectDate.setOnClickListener(v -> {
+            final Calendar calendar = Calendar.getInstance();
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+            DatePickerDialog datePickerDialog = new DatePickerDialog(this,
+                    (view, selectedYear, selectedMonth, selectedDay) -> {
+                        calendar.set(Calendar.YEAR, selectedYear);
+                        calendar.set(Calendar.MONTH, selectedMonth);
+                        calendar.set(Calendar.DAY_OF_MONTH, selectedDay);
+                        String formattedDate = dateFormat.format(calendar.getTime());
+                        textViewFecha.setText(formattedDate); // Muestra la fecha formateada
+                        selectedDate = formattedDate; // Guarda la fecha formateada para uso posterior
+                    }, year, month, day);
+            datePickerDialog.show();
         });
 
     }
@@ -165,13 +201,15 @@ public class FoodFormActivity extends AppCompatActivity {
         }
     }
 
+
     // Método para validar que los campos de texto y la selección de categoría no están vacíos.
     private boolean validateInputs() {
         String name = editTextNombre.getText().toString().trim();
         String price = editTextPrecio.getText().toString().trim();
         String description = editTextDescripcion.getText().toString().trim();
-        int selectedId = radioGroupTipo.getCheckedRadioButtonId();
+        String date = textViewFecha.getText().toString().trim();
 
+        int selectedId = radioGroupTipo.getCheckedRadioButtonId();
 
         if (name.isEmpty()) {
             editTextNombre.setError("El nombre no puede estar vacío");
@@ -189,6 +227,10 @@ public class FoodFormActivity extends AppCompatActivity {
             Toast.makeText(this, "Por favor, seleccione una categoría", Toast.LENGTH_SHORT).show();
             return false;
         }
+        if (date.isEmpty() || date.equals("Seleccionar Fecha")) {
+            Toast.makeText(this, "Por favor, seleccione una fecha", Toast.LENGTH_SHORT).show();
+            return false;
+        }
         return true; // Todos los campos están correctamente llenados
     }
 
@@ -199,6 +241,8 @@ public class FoodFormActivity extends AppCompatActivity {
         String name = editTextNombre.getText().toString();
         String price = editTextPrecio.getText().toString();
         String description = editTextDescripcion.getText().toString();
+        String date = textViewFecha.getText().toString(); // Obtener la fecha del TextView
+
         int selectedId = radioGroupTipo.getCheckedRadioButtonId();
         final String[] categoriaPath = new String[1]; // Usando un array de un elemento
 
@@ -215,7 +259,7 @@ public class FoodFormActivity extends AppCompatActivity {
 
         if (!categoriaPath[0].isEmpty()) {
             DatabaseReference categoryRef = dbRef.child(categoriaPath[0]);
-            Platillo platillo = new Platillo(id, name, description, price, imageUrl);
+            Platillo platillo = new Platillo(id, name, description, price, imageUrl, date);
             categoryRef.push().setValue(platillo)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
@@ -223,10 +267,6 @@ public class FoodFormActivity extends AppCompatActivity {
                                 Toast.makeText(FoodFormActivity.this, "Platillo guardado en " + categoriaPath[0], Toast.LENGTH_SHORT).show();
                                 finish();
                             }
-                            /*finish();
-                            overridePendingTransition(0, 0);
-                            startActivity(getIntent());
-                            overridePendingTransition(0, 0);*/
                         } else {
                             Toast.makeText(FoodFormActivity.this, "Error al guardar", Toast.LENGTH_SHORT).show();
                         }

@@ -2,6 +2,8 @@ package com.example.cp192194_av180327_cm180362_pa210749;
 
 import android.content.Context;
 import android.content.Intent;
+import android.icu.text.SimpleDateFormat;
+import android.icu.util.Calendar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class PlatilloAdapter extends RecyclerView.Adapter<PlatilloAdapter.PlatilloViewHolder> {
@@ -32,6 +35,10 @@ public class PlatilloAdapter extends RecyclerView.Adapter<PlatilloAdapter.Platil
     private String category;
     private String Accion;
     private DatabaseReference databaseReference;
+    private String getCurrentDate() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        return dateFormat.format(Calendar.getInstance().getTime());
+    }
 
     public PlatilloAdapter(Context context, List<Platillo> platillos, String category) {
         this.context = context;
@@ -79,6 +86,14 @@ public class PlatilloAdapter extends RecyclerView.Adapter<PlatilloAdapter.Platil
             priceView.setText("$" + platillo.getPrice());
             Picasso.get().load(platillo.getImageUrl()).into(imageView);
 
+            if(FirebaseAuth.getInstance().getCurrentUser() != null){
+            btnEditar.setVisibility(View.VISIBLE);
+            btnEliminar.setVisibility(View.VISIBLE);
+        }else{
+                btnEditar.setVisibility(View.GONE);
+                btnEliminar.setVisibility(View.GONE);
+        }
+
             btnEditar.setOnClickListener(v -> editarPlatillo(platillo, category));
             btnEliminar.setOnClickListener(v -> eliminarPlatillo(platillo, category));
         }
@@ -94,6 +109,7 @@ public class PlatilloAdapter extends RecyclerView.Adapter<PlatilloAdapter.Platil
             String PriceEdit = platillo.getPrice();
             String ImageEdit = platillo.getImageUrl();
             String CategoryEdit = category;
+            String DateEdit = platillo.getDate();
             Accion = "Editar";
 
             eliminarPlatillo(platillo, category);
@@ -104,6 +120,7 @@ public class PlatilloAdapter extends RecyclerView.Adapter<PlatilloAdapter.Platil
             intent.putExtra("PriceEdit", PriceEdit);
             intent.putExtra("ImageEdit", ImageEdit);
             intent.putExtra("CategoryEdit", CategoryEdit);
+            intent.putExtra("DateEdit",DateEdit);
             intent.putExtra("Accion", Accion);
             context.startActivity(intent); // Utiliza el contexto para iniciar la actividad
 
@@ -112,8 +129,8 @@ public class PlatilloAdapter extends RecyclerView.Adapter<PlatilloAdapter.Platil
         private void eliminarPlatillo(Platillo platillo, String category) {
             DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
             DatabaseReference dbRef = mDatabase.child("platillos").child(category);
-
-            dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            String today = getCurrentDate();
+            dbRef.orderByChild("date").equalTo(today).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     // Iterar sobre los hijos de "Cena" para obtener solo las claves y nombres de los platillos

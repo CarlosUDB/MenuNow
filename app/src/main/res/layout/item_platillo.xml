@@ -4,45 +4,58 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp">
+    android:layout_margin="16dp"
+    android:paddingBottom="10dp"
+    android:background="#D45342">
 
     <ImageView
         android:id="@+id/imageViewPlatillo"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:scaleType="centerCrop"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:src="@tools:sample/avatars"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@tools:sample/avatars" />
 
     <TextView
         android:id="@+id/textViewNombre"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="sans-serif-black"
+        android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@+id/imageViewPlatillo"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textColor="@color/secondary"
+        android:layout_marginLeft="10dp"
         app:layout_constraintEnd_toStartOf="@+id/textViewPrecio"
-        tools:text="Nombre del Platillo"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageViewPlatillo"
+        tools:text="Nombre del Platillo" />
 
     <TextView
         android:id="@+id/textViewPrecio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
+        android:fontFamily="sans-serif-black"
+        android:textColor="@color/secondary"
+        android:layout_marginRight="10dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
         app:layout_constraintBaseline_toBaselineOf="@+id/textViewNombre"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:text="$12.00"/>
+        tools:text="$12.00" />
 
     <TextView
         android:id="@+id/textViewDescripcion"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:textAlignment="center"
-        android:textSize="14sp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:textColor="@color/secondary"
+        android:textStyle="normal"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewNombre"
@@ -50,10 +63,12 @@
 
     <Button
         android:id="@+id/btnEditar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_width="125dp"
+        android:layout_height="40dp"
         android:layout_marginTop="8dp"
         android:text="@string/btneditar"
+        android:textColor="#000000"
+        app:backgroundTint="@color/secondary"
         app:layout_constraintEnd_toStartOf="@+id/btnEliminar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewDescripcion"
@@ -61,10 +76,12 @@
 
     <Button
         android:id="@+id/btnEliminar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_width="125dp"
+        android:layout_height="40dp"
         android:layout_marginTop="8dp"
         android:text="@string/btneliminar"
+        android:textColor="#000000"
+        app:backgroundTint="@color/secondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/btnEditar"
         app:layout_constraintTop_toBottomOf="@+id/textViewDescripcion"
