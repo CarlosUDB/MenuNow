@@ -129,8 +129,7 @@ public class PlatilloAdapter extends RecyclerView.Adapter<PlatilloAdapter.Platil
         private void eliminarPlatillo(Platillo platillo, String category) {
             DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
             DatabaseReference dbRef = mDatabase.child("platillos").child(category);
-            String today = getCurrentDate();
-            dbRef.orderByChild("date").equalTo(today).addValueEventListener(new ValueEventListener() {
+            dbRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     // Iterar sobre los hijos de "Cena" para obtener solo las claves y nombres de los platillos

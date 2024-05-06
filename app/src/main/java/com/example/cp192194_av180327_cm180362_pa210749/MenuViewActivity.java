@@ -48,7 +48,11 @@ public class MenuViewActivity extends AppCompatActivity {
 
         DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("platillos").child(category);
         String today = getCurrentDate();
-        if(FirebaseAuth.getInstance().getCurrentUser() != null){
+        boolean userLoggedIn = FirebaseAuth.getInstance().getCurrentUser() != null;
+
+        btnNewDish.setVisibility(userLoggedIn ? View.VISIBLE : View.INVISIBLE);
+
+        if (userLoggedIn) {
             databaseRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -58,10 +62,9 @@ public class MenuViewActivity extends AppCompatActivity {
                             Platillo platillo = snapshot.getValue(Platillo.class);
                             platillos.add(platillo);
                         }
-                    }else {
-                        // No se encontraron platillos para la fecha actual
-                        Toast.makeText(MenuViewActivity.this, "No hay platillos para el día de hoy.", Toast.LENGTH_LONG).show();
-                        adapter.notifyDataSetChanged(); // Aunque la lista esté vacía, es bueno notificar al adaptador
+                    } else {
+                        // No se encontraron platillos
+                        Toast.makeText(MenuViewActivity.this, "No hay platillos disponibles.", Toast.LENGTH_LONG).show();
                     }
                     adapter.notifyDataSetChanged();
                 }
@@ -70,9 +73,9 @@ public class MenuViewActivity extends AppCompatActivity {
                 public void onCancelled(DatabaseError databaseError) {
                     Toast.makeText(MenuViewActivity.this, "Failed to load data.", Toast.LENGTH_LONG).show();
                 }
-
             });
-        }else{
+        } else {
+
             databaseRef.orderByChild("date").equalTo(today).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -82,10 +85,9 @@ public class MenuViewActivity extends AppCompatActivity {
                             Platillo platillo = snapshot.getValue(Platillo.class);
                             platillos.add(platillo);
                         }
-                    }else {
+                    } else {
                         // No se encontraron platillos para la fecha actual
                         Toast.makeText(MenuViewActivity.this, "No hay platillos para el día de hoy.", Toast.LENGTH_LONG).show();
-                        adapter.notifyDataSetChanged(); // Aunque la lista esté vacía, es bueno notificar al adaptador
                     }
                     adapter.notifyDataSetChanged();
                 }
@@ -94,18 +96,12 @@ public class MenuViewActivity extends AppCompatActivity {
                 public void onCancelled(DatabaseError databaseError) {
                     Toast.makeText(MenuViewActivity.this, "Failed to load data.", Toast.LENGTH_LONG).show();
                 }
-
             });
+
         }
 
 
-        // Verificar el estado de autenticación para mostrar/ocultar botones
 
-        if(FirebaseAuth.getInstance().getCurrentUser() != null){
-            btnNewDish.setVisibility(View.VISIBLE);
-        }else{
-            btnNewDish.setVisibility(View.INVISIBLE);
-        }
 
         btnReturn.setOnClickListener(v -> {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
