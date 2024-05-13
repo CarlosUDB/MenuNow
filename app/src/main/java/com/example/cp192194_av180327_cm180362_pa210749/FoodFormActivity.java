@@ -181,25 +181,25 @@ public class FoodFormActivity extends AppCompatActivity {
 
     // Método para subir la imagen a Firebase Storage y validar los inputs antes de guardar.
     private void uploadImage() {
-        String ImageEdit = getIntent().getStringExtra("ImageEdit");
-        if (ImageEdit == null & imageUri != null && validateInputs()) {
+        // Comprobar si estamos en modo de edición y si se seleccionó una nueva imagen.
+        String imageEdit = getIntent().getStringExtra("ImageEdit");
+        if (imageUri != null && validateInputs()) {  // Si se selecciona una nueva imagen.
             StorageReference fileRef = storageRef.child("FoodImages/" + UUID.randomUUID().toString());
             fileRef.putFile(imageUri)
                     .addOnSuccessListener(taskSnapshot -> fileRef.getDownloadUrl().addOnSuccessListener(uri -> {
                         String imageUrl = uri.toString();
-                        savePlatillo(imageUrl);
+                        savePlatillo(imageUrl);  // Usar la nueva URL de la imagen para guardar.
                     }))
                     .addOnFailureListener(e -> {
                         Toast.makeText(FoodFormActivity.this, "Fallo al cargar la imagen", Toast.LENGTH_SHORT).show();
                     });
-        } else if (ImageEdit != null) {
-            savePlatillo(ImageEdit);
+        } else if (imageEdit != null) {  // No se seleccionó una nueva imagen, usar la existente.
+            savePlatillo(imageEdit);
         } else {
-            if (imageUri == null & ImageEdit == null) {
-                Toast.makeText(this, "Por favor, seleccione una imagen", Toast.LENGTH_SHORT).show();
-            }
+            Toast.makeText(this, "Por favor, seleccione una imagen", Toast.LENGTH_SHORT).show();
         }
     }
+
 
 
     // Método para validar que los campos de texto y la selección de categoría no están vacíos.

@@ -100,9 +100,6 @@ public class MenuViewActivity extends AppCompatActivity {
 
         }
 
-
-
-
         btnReturn.setOnClickListener(v -> {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);

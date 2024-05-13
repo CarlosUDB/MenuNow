@@ -125,6 +125,8 @@ public class PlatilloAdapter extends RecyclerView.Adapter<PlatilloAdapter.Platil
             context.startActivity(intent); // Utiliza el contexto para iniciar la actividad
 
         }
+        // Lógica para editar el platillo
+
 
         private void eliminarPlatillo(Platillo platillo, String category) {
             DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
